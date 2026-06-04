@@ -16,6 +16,8 @@ use App\Http\Controllers\API\LoginController;
 |
 */
 Route::post('/sync', [\App\Http\Controllers\SyncController::class, 'syncData']);
+Route::get('/sync/pull', [\App\Http\Controllers\SyncController::class, 'pullData']);
+Route::get('/sync/tables', [\App\Http\Controllers\SyncController::class, 'syncTables']);
 //Route::get('/sendDataToLive', [\App\Http\Controllers\DataSyncController::class, 'sendDataToLive']);
 Route::prefix('v1')->group(function (){
     //Route::post('/syncLiveDataFromLocal', [\App\Http\Controllers\DataSyncController::class, 'syncLiveDataFromLocal']);

@@ -7,6 +7,114 @@ use Illuminate\Support\Facades\DB;
 
 class SyncController extends Controller
 {
+    /**
+     * Tables exchanged between local and live databases (desktop + syncDataLive).
+     */
+    protected function syncTableNames(): array
+    {
+        $tables = [
+            'in_patient_admissions',
+            'patient_investigations',
+            'patients',
+            'products',
+            'product_kits',
+            'main_category',
+            'sub_category',
+            'item_generic_name',
+            'item_make',
+            'consultants',
+            'patient_investigation_result',
+            'patient_investigations_payments',
+            'appointments',
+            'sale',
+            'sale_details',
+            'sale_payments',
+            'temp_sale',
+            'temp_sale_details',
+            'grn',
+            'grn_details',
+            'pharmacy_transfer',
+            'pharmacy_transfer_details',
+            'pharmacy_return_items',
+            'investigation_category',
+            'investigation_sub_category',
+            'investigation_sub_category_parameters',
+            'consultant_procedures',
+            'consultant_procedure_pricing',
+            'consultant_speciality',
+            'consultant_type',
+        ];
+
+        if (date('His') >= 210101 && date('His') <= 235959) {
+            $tables[] = 'finance_heads';
+            $tables[] = 'finance_transactions';
+            $tables[] = 'finance_vouchers';
+        }
+
+        return $tables;
+    }
+
+    protected function isAllowedSyncTable(string $table): bool
+    {
+        return in_array($table, $this->syncTableNames(), true);
+    }
+
+    public function syncTables()
+    {
+        return response()->json([
+            'status' => 'success',
+            'tables' => $this->syncTableNames(),
+        ]);
+    }
+
+    /**
+     * Pull rows from live DB → local desktop (GET chunks by id cursor).
+     */
+    public function pullData(Request $request)
+    {
+        $table = $request->input('table');
+        $afterId = (int) $request->input('after_id', 0);
+        $limit = min(max((int) $request->input('limit', 30), 1), 100);
+
+        if (!$table || !$this->isAllowedSyncTable($table)) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Invalid or disallowed table name',
+            ], 400);
+        }
+
+        if (!DB::getSchemaBuilder()->hasTable($table)) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => "Table {$table} not found in database",
+            ], 400);
+        }
+
+        if (!DB::getSchemaBuilder()->hasColumn($table, 'id')) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => "Table {$table} has no id column for sync pull",
+            ], 400);
+        }
+
+        $rows = DB::table($table)
+            ->where('id', '>', $afterId)
+            ->orderBy('id')
+            ->limit($limit)
+            ->get();
+
+        $maxId = $rows->max('id') ?? $afterId;
+
+        return response()->json([
+            'status'   => 'success',
+            'table'    => $table,
+            'after_id' => $afterId,
+            'max_id'   => $maxId,
+            'count'    => $rows->count(),
+            'data'     => $rows,
+        ]);
+    }
+
     public function syncData(Request $request)
     {
         $table = $request->input('table');
@@ -16,6 +124,13 @@ class SyncController extends Controller
             return response()->json([
                 'status'  => 'error',
                 'message' => 'Invalid request: table or data missing'
+            ], 400);
+        }
+
+        if (!$this->isAllowedSyncTable($table)) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Invalid or disallowed table name',
             ], 400);
         }
 
@@ -64,47 +179,7 @@ public function syncLoclDataWithLive()
         file_put_contents($file, '');
     }
 
-    $tables = [
-        "in_patient_admissions",
-        "patient_investigations",
-        "patients",
-        "products",
-        "product_kits",
-        "main_category",
-        "sub_category",
-        "item_generic_name",
-        "item_make",
-        "consultants",
-        "patient_investigation_result",
-        "patient_investigations_payments",
-        "appointments",
-        "sale",
-        "sale_details",
-        "sale_payments",
-        "temp_sale",
-        "temp_sale_details",
-        "grn",
-        "grn_details",
-        "pharmacy_transfer",
-        "pharmacy_transfer_details",
-        "pharmacy_return_items",
-        "investigation_category",
-        "investigation_sub_category",
-        "investigation_sub_category_parameters",
-        "consultant_procedures",
-        "consultant_procedure_pricing",
-        "consultant_speciality",
-        "consultant_type",
-
-
-    ];
-
-    if(date("His") >= 210101 && date("His") <= 235959){
-        $tables[] =  "finance_heads";
-        $tables[] =  'finance_transactions';
-        $tables[] =  'finance_vouchers';
-    }
-
+    $tables = $this->syncTableNames();
 
     $summary = [
         'success' => [],
