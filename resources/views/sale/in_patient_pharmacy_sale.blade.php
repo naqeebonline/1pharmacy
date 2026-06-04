@@ -1462,21 +1462,24 @@
                 <input type="text" id="invoice_number" style="pointer-events: none;" required="required" value="{{$invoiceNo ?? ''}}" class="form-control" readonly>
             </div>
 
+            @if(config('app.in_patient_show_reference_number', true))
             <div class="col-6 col-md-1">
                 <label class="pos-field-label" for="sale_descriptions">Reference #</label>
-                <input type="text" id="sale_descriptions" required="required" value="" class="form-control">
+                <input type="text" id="sale_descriptions" value="" class="form-control" required>
             </div>
+            @endif
 
+            @if(config('app.in_patient_show_medicine_type', true))
             <div class="col-12 col-md-2">
                 <label class="pos-field-label" for="medicine_type">Medicine Type <span class="text-danger">*</span></label>
                 <select class="form-select" id="medicine_type" required>
                     <option value="">Select Medicine Type...</option>
                     <?php foreach ($medicine_types as $key => $value) { ?>
-                        <option value="<?php echo $value->value; ?>" {{($type == $value->value) ? "selected" : ""}} ><?php echo ucfirst($value->name); ?>  </option>
+                        <option value="<?php echo $value->value; ?>"><?php echo ucfirst($value->name); ?></option>
                     <?php } ?>
-                   
                 </select>
             </div>
+            @endif
 
             <div class="col-12 col-md-3">
                 <label class="pos-field-label" for="SID">Customer</label>
@@ -1505,12 +1508,11 @@
             <div class="col-12 pos-sale-main " id="pos-sale-main">
 
                 <div class="row g-2 mb-2 pos-card">
-                    <div class="col-12 {{ empty($type) ? '' : 'd-none' }}" id="pos-product-entry-hint">
-                        <p class="mb-0">Please select <strong>Medicine Type</strong> above to search and add products.</p>
+                    <div class="col-12" id="pos-product-entry-hint">
+                        <p class="mb-0" id="pos-product-entry-hint-text"></p>
                     </div>
-                    <div class="col-12 {{ empty($type) ? 'd-none' : '' }}" id="pos-product-entry-wrap">
+                    <div class="col-12 d-none" id="pos-product-entry-wrap">
                     <div class="row g-2">
-                    @if($type !='' || $type == '')
                     <div class="col-12 col-md-5">
                         <label class="pos-field-label d-block mb-1" for="product_id" style="color: black !important;">
                             Product
@@ -1523,21 +1525,17 @@
                     </div>
 
 
-                    @if($type == "Home" || $type == "Ward")
-                    <div class="col-12 col-md-2 d-none">
+                    <div class="col-12 col-md-2 d-none" id="pos-dose-type-wrap">
                         <label class="pos-field-label" for="dose_type" style="color: black !important;">Dose Type</label>
                         <select class="form-select" id="dose_type">
-                           
                             <option value="-" selected>-</option>
                             <option value="TDS">TDS (صبح ,دوپہر ,شام )</option>
                             <option value="BD">BD (صبح ,شام )</option>
                             <option value="OD">OD (صبح )</option>
-
                             <option value="HS">HS (رات کو)</option>
                             <option value="QID">QID (ہر 6 گھنٹے بعد)</option>
                         </select>
                     </div>
-                    @endif
 
 
                    
@@ -1578,7 +1576,6 @@
                         <label class="pos-field-label" for="avaliable_qty">Available Qty</label>
                         <input type="text" disabled class="form-control" id="avaliable_qty" placeholder="Available Quantity" readonly>
                     </div>
-                    @endif
                     </div>
                     </div>
                 </div>
@@ -1830,6 +1827,44 @@
         var serverRetailPrintMode = @json($retail_print_mode ?? 'a4');
         var retailPrintWindow = null;
         var posGridInputPrevious = {};
+        var IN_PATIENT_SHOW_MEDICINE_TYPE = @json((bool) config('app.in_patient_show_medicine_type', true));
+        var IN_PATIENT_SHOW_REFERENCE_NUMBER = @json((bool) config('app.in_patient_show_reference_number', true));
+
+        function getSelectedMedicineType() {
+            if (!IN_PATIENT_SHOW_MEDICINE_TYPE) {
+                return '';
+            }
+            return $('#medicine_type').val() || '';
+        }
+
+        function updateProductEntryHint() {
+            var parts = [];
+            if (IN_PATIENT_SHOW_MEDICINE_TYPE && !getSelectedMedicineType()) {
+                parts.push('Medicine Type');
+            }
+            if (!$('#SID').val()) {
+                parts.push('Customer');
+            }
+            var $hintText = $('#pos-product-entry-hint-text');
+            if (!parts.length) {
+                $hintText.text('');
+                return;
+            }
+            if (parts.length === 1) {
+                $hintText.html('Please select <strong>' + parts[0] + '</strong> above to search and add products.');
+            } else {
+                $hintText.html('Please select <strong>' + parts[0] + '</strong> and <strong>' + parts[1] + '</strong> above to search and add products.');
+            }
+        }
+
+        function toggleDoseTypeField() {
+            var medicineType = getSelectedMedicineType();
+            if (medicineType === 'Home' || medicineType === 'Ward') {
+                $('#pos-dose-type-wrap').removeClass('d-none');
+            } else {
+                $('#pos-dose-type-wrap').addClass('d-none');
+            }
+        }
 
         function buildPosGridCellInput(field, value, productId) {
             var isTax = field === 'sale_tax' || field === 'income_tax';
@@ -2242,7 +2277,13 @@
         }
 
         function canLoadInPatientProducts() {
-            return !!$('#medicine_type').val() && !!$('#SID').val();
+            if (!$('#SID').val()) {
+                return false;
+            }
+            if (IN_PATIENT_SHOW_MEDICINE_TYPE && !getSelectedMedicineType()) {
+                return false;
+            }
+            return true;
         }
 
         function mergeRetailPreloadedProducts(products) {
@@ -2494,7 +2535,11 @@
             }, options || {});
 
             if (!canLoadInPatientProducts()) {
-                popupMsg('Please select Medicine Type and Customer first', 'info');
+                var msg = 'Please select Customer first';
+                if (IN_PATIENT_SHOW_MEDICINE_TYPE) {
+                    msg = 'Please select Medicine Type and Customer first';
+                }
+                popupMsg(msg, 'info');
                 return $.Deferred().resolve().promise();
             }
 
@@ -2625,25 +2670,30 @@
             }
         }
 
-        function toggleProductEntryByMedicineType() {
-            var medicineType = $('#medicine_type').val();
-            if (!medicineType) {
-                $('#pos-product-entry-wrap').addClass('d-none');
-                $('#pos-product-entry-hint').removeClass('d-none');
-                $('#product_id').val(null).trigger('change');
-                $('#pack_quantity').val('1');
-                $('#sale_quantity').val('1');
-                $('#SalePrice').val('');
-            } else {
+        function clearProductEntryFields() {
+            $('#product_id').val(null).trigger('change');
+            $('#pack_quantity').val('1');
+            $('#sale_quantity').val('1');
+            $('#SalePrice').val('');
+        }
+
+        function toggleProductEntryVisibility() {
+            updateProductEntryHint();
+            toggleDoseTypeField();
+
+            if (canLoadInPatientProducts()) {
                 $('#pos-product-entry-wrap').removeClass('d-none');
                 $('#pos-product-entry-hint').addClass('d-none');
+            } else {
+                $('#pos-product-entry-wrap').addClass('d-none');
+                $('#pos-product-entry-hint').removeClass('d-none');
+                clearProductEntryFields();
             }
         }
 
         $(document).ready(function() {
-            toggleProductEntryByMedicineType();
+            toggleProductEntryVisibility();
             toggleQtyEntryMode();
-            tryLoadInPatientProducts({ showLoader: true, showToast: false });
 
             $(document).on('change', 'input[name="qty_entry_mode"]', toggleQtyEntryMode);
 
@@ -2670,12 +2720,10 @@
             // $("#product_id").select2();
 
             $("body").on("change", "#medicine_type", function() {
-                var value = $(this).val();
-                if (!value) {
-                    toggleProductEntryByMedicineType();
-                    return;
+                toggleProductEntryVisibility();
+                if (canLoadInPatientProducts()) {
+                    tryLoadInPatientProducts({ showLoader: true, showToast: false });
                 }
-                window.location = "{{route('pos.in_patient_pharmacy_sale')}}?type=" + encodeURIComponent(value);
             });
 
             $("body").on("change", "#discount_id", function() {
@@ -2689,7 +2737,10 @@
             $("body").on("change", "#SID", function() {
                 patient_admission_id = $('#SID option:selected').attr('data-admission_id');
                 get_prev_balance();
-                tryLoadInPatientProducts({ showLoader: false, showToast: false });
+                toggleProductEntryVisibility();
+                if (canLoadInPatientProducts()) {
+                    tryLoadInPatientProducts({ showLoader: false, showToast: false });
+                }
             });
 
             $("body").on("change", "#barcode", function() {
@@ -2776,7 +2827,7 @@
             });
 
             $(document).on("change", "#product_id", function() {
-                if (!$('#medicine_type').val()) {
+                if (IN_PATIENT_SHOW_MEDICINE_TYPE && !getSelectedMedicineType()) {
                     return;
                 }
                 if (!$('#product_id').val()) {
@@ -2823,9 +2874,9 @@
                 SID = $("#SID").val();
                 company_name = $("#company_name").val();
                 invoice_number = $("#invoice_number").val();
-                sale_descriptions = $("#sale_descriptions").val();
+                sale_descriptions = IN_PATIENT_SHOW_REFERENCE_NUMBER ? $("#sale_descriptions").val() : '';
                 discount_amount = $("#discount_amount").val();
-                medicine_type = $("#medicine_type").val();
+                medicine_type = getSelectedMedicineType();
                 currency_type = $("#currency_type").val();
                 bill_date = $("#bill_date").val();
                 customer_name = $("#customer_name").val();
@@ -2840,13 +2891,13 @@
                 net_Billamount = parseInt(BillAmount) - parseInt(discount_amount);
 
 
-                if (sale_descriptions == '') {
+                if (IN_PATIENT_SHOW_REFERENCE_NUMBER && sale_descriptions == '') {
                     popupMsg("Please Select Refrence Number", "error");
                     $("#sale_descriptions").focus();
                     $("#save_bill").show();
                     return false;
-                } 
-                
+                }
+
                 if (SID == '') {
                     popupMsg("Please Select Customer", "error");
                     $("#SID").focus();
@@ -2863,7 +2914,7 @@
                 }*/
 
 
-                if (medicine_type == '') {
+                if (IN_PATIENT_SHOW_MEDICINE_TYPE && medicine_type == '') {
                     popupMsg("Please Select Medicine Type", "error");
                     $("#medicine_type").focus();
                     $("#save_bill").show();
@@ -3240,13 +3291,18 @@
         }
 
         function saveItemToBill() {
-            if (!$('#medicine_type').val()) {
-                popupMsg('Please select Medicine Type before adding products.', 'error');
-                $('#medicine_type').focus();
+            if (!canLoadInPatientProducts()) {
+                if (!$('#SID').val()) {
+                    popupMsg('Please select Customer before adding products.', 'error');
+                    $('#SID').focus();
+                } else if (IN_PATIENT_SHOW_MEDICINE_TYPE) {
+                    popupMsg('Please select Medicine Type before adding products.', 'error');
+                    $('#medicine_type').focus();
+                }
                 return false;
             }
 
-            var medicine_type = "{{$type}}";
+            var medicine_type = getSelectedMedicineType();
             var dose_type = '';
             if (medicine_type == 'Home' || medicine_type == "Ward") {
                 dose_type = $("#dose_type").val();

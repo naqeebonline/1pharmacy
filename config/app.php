@@ -14,6 +14,15 @@ return [
     "BRANCH_CODE"=>"AJM-01-",
     "Branch_Name"=>"",
     "LIVE_URL"=>"https://1pharmacy.amch.org.pk/",
+
+    /*
+    |--------------------------------------------------------------------------
+    | In-Patient Pharmacy Sale — optional header fields
+    |--------------------------------------------------------------------------
+    | Set to false for clients that do not use Medicine Type or Reference #.
+    */
+    'in_patient_show_medicine_type' => true,
+    'in_patient_show_reference_number' => true,
     /*
     |--------------------------------------------------------------------------
     | Application Name
