@@ -15,9 +15,14 @@ use App\Http\Controllers\API\LoginController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::post('/sync', [\App\Http\Controllers\SyncController::class, 'syncData']);
-Route::get('/sync/pull', [\App\Http\Controllers\SyncController::class, 'pullData']);
-Route::get('/sync/tables', [\App\Http\Controllers\SyncController::class, 'syncTables']);
+/*
+| Desktop sync — exempt from default api throttle (60/min) to avoid HTTP 429.
+*/
+Route::middleware('throttle:sync')->group(function () {
+    Route::post('/sync', [\App\Http\Controllers\SyncController::class, 'syncData']);
+    Route::get('/sync/pull', [\App\Http\Controllers\SyncController::class, 'pullData']);
+    Route::get('/sync/tables', [\App\Http\Controllers\SyncController::class, 'syncTables']);
+})->withoutMiddleware(['throttle:api']);
 //Route::get('/sendDataToLive', [\App\Http\Controllers\DataSyncController::class, 'sendDataToLive']);
 Route::prefix('v1')->group(function (){
     //Route::post('/syncLiveDataFromLocal', [\App\Http\Controllers\DataSyncController::class, 'syncLiveDataFromLocal']);

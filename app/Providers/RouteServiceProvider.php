@@ -52,5 +52,10 @@ class RouteServiceProvider extends ServiceProvider
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
+
+        // Desktop full sync: many chunked requests per run (push + pull per table).
+        RateLimiter::for('sync', function (Request $request) {
+            return Limit::perMinute(3000)->by($request->ip());
+        });
     }
 }

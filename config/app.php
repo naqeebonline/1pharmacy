@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Facade;
 
 return [
-    "live_url"=>"https://1pharmacy.amch.org.pk/",
+    "live_url"=>"https://pharmacy.amch.org.pk/",
     "COMPANY_NAME"=>"1 PHARMACY",
     "COMPANY_ADDRESS"=>"Address of Pharmacy",
     "COMPANY_WEBSITE"=>"https://www.1pharmacy.org.pk",
@@ -13,7 +13,7 @@ return [
     "COMPANY_EMAIL"=>"info@1pharmacy.org.pk",
     "BRANCH_CODE"=>"AJM-01-",
     "Branch_Name"=>"",
-    "LIVE_URL"=>"https://1pharmacy.amch.org.pk/",
+    "LIVE_URL"=>"https://pharmacy.amch.org.pk/",
 
     /*
     |--------------------------------------------------------------------------
