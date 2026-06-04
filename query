@@ -1,0 +1,5 @@
+ALTER TABLE `visitors` ADD `on_behalf` VARCHAR(191) NULL DEFAULT NULL AFTER `visit_to_id`, ADD `designation` VARCHAR(192) NULL DEFAULT NULL AFTER `on_behalf`;
+
+
+
+ALTER TABLE `personal_access_tokens` ADD `expires_at` DATETIME NULL DEFAULT NULL AFTER `abilities`;

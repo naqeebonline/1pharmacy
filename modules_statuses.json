@@ -1,0 +1,15 @@
+{
+    "Settings": true,
+    "SupplyChain": true,
+    "IncidentReporting": true,
+    "TaskManagement": true,
+    "EIdentity": true,
+    "Vms": true,
+    "Dengue": true,
+    "BusinessPortal": true,
+    "EOffice": true,
+    "Agriculture": true,
+    "CommerceChamber": true,
+    "Fmc": true,
+    "RevenueRecordsMappingPlatform": true
+}

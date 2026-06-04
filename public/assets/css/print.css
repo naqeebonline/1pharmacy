@@ -1,0 +1,245 @@
+
+@media print {
+    .header {
+        display: none;
+    }
+
+    .page-content {
+        margin: 0px;
+    }
+
+    .page-content .content {
+        padding: 20px;
+    }
+
+    .btn {
+        display: none;
+    }
+
+    .row-fluid [class*="span"] {
+        width: 96%;
+    }
+
+    #main-menu {
+        display: none;
+    }
+
+    #sidr {
+        display: none;
+    }
+
+    .printable{
+        font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        padding: 10px;
+        border: 0px solid red !important;
+    }
+
+    .report_head h3, .report_head h5, .report_head p{
+        margin: 0px;
+        padding: 0px;
+    }
+
+    .report_head p{
+        font-size: 12px;
+    }
+
+    table {
+        font-size: 11px !important;
+        width: 100%;
+    }
+    .table td, .table th{
+        border:1px solid #ccc !important;
+        border-collapse: collapse;
+        padding:3px !important;
+        margin: 0px !important;
+        font-size: 11px !important;
+        text-align: left !important;
+    }
+    .table .text-center, .table .text-center{
+        text-align:center !important;
+    }
+    .hide_in_print{
+        display: none;
+    }
+    #sec_line{
+        
+        width: 50px;
+        height: 60px;
+        background: linear-gradient(to top left, transparent calc(49% - 1px), #505458, transparent calc(50% + 1px) );
+        background-color:black;
+        position: absolute;
+        float: left;
+        
+
+    }
+    #hr_line_sig{
+        height:55px;
+        width:1px;
+        color:black;
+        position: absolute;
+        transform:rotate(210deg);
+        -o-transform:rotate(210deg);
+        -moz-transform:rotate(210deg);
+        -webkit-transform:rotate(210deg);
+    }
+
+    .show_in_print{
+        display:block;
+    }
+
+
+    .big_table td, .big_table th{
+        padding: 2px !important;
+    }
+
+    .page_break{
+        page-break-after: always;
+    }
+
+    .underline{
+        text-decoration: underline;
+    }
+
+    .borderb{
+        border-bottom: 1px dotted #d3d3d3;
+    }
+
+    .bordert{
+        b-order-top: 1px solid #c6c6c6;
+    }
+
+
+
+    /* retirement notification style */
+    #retirement_notification p{
+        font-size:16px;
+    }
+
+    .header_logo{
+        margin-bottom:20px;
+        width:20%;
+        float: left;
+        b-order:1px solid red;
+    }
+
+    .header_desc{
+        width:78%;
+        float: right;
+        b-order:1px solid red;
+    }
+
+
+    .table-responsive{
+        width: 100%;
+    }
+    .table-responsive table{
+        width:100%;
+        overflow-x: visible;
+    }
+
+    a[href]:after {
+        content: none !important;
+    }
+
+
+    .dt-buttons, .dataTables_info, .dataTables_paginate, .dataTables_filter{
+        display: none !important;
+    }
+
+    td.bg_green, .bg_green td{
+        background-color: rgba(50, 255, 41, 0.31) !important;
+    }
+
+    td.bg_yellow, .bg_yellow td{
+        background-color: rgba(255, 252, 46, 0.31) !important;
+    }
+
+    td.bg_light_red2, .bg_light_red2 td{
+        background-color: rgba(255, 0, 0, 0.08) !important;
+    }
+
+    td.bg_red, .bg_red td{
+        background-color: rgba(255, 0, 0, 0.41) !important;
+    }
+
+    td.bg_orange, .bg_orange td{
+        background-color: rgba(255,150,0,.6) !important;
+    }
+
+
+    td.bg_red_ligther{
+        background-color: rgba(255,0,0,.4) !important;
+    }
+
+    td.bg_red_darker{
+        background-color: rgba(255,0,0,.8) !important;
+        color: white !important;
+    }
+
+    td.bg_black_darker{
+        background-color: rgba(0,0,0,1) !important;
+        color: white !important;
+    }
+
+
+    .table th{
+        text-transform: capitalize;
+    }
+
+    .ins-report-verticaltext{
+        height: 150px !important;
+        vertical-align: middle !important;
+        text-align: center;
+        word-wrap: break-word;
+    }
+    .ins-report-verticaltextSubHeading{
+        height: 200px !important;
+        vertical-align: middle !important;
+        text-align: center;
+        word-wrap: break-word;
+    }
+
+    .ins-report-verticaltext p,
+    .ins-report-verticaltextSubHeading p{
+        transform: rotate(90deg);
+    }
+    .ins-report-verticaltextSubHeading p{
+        font-size: 10px;
+        width: 33px;
+        margin: 0px !important;
+        white-space: pre;
+    }
+    .ins-report-table-report {
+        text-align:center;
+        width:1000px;
+    }
+    .ins-report-table-report tbody td{
+        font-size: 10px;
+        padding: 2px;
+    }
+    .ins-report-table-report thead th,
+    .ins-report-table-report thead th strong{
+        font-size: 10px;
+        padding: 1px;
+    }
+
+    .print_patient_card{
+        border: 2px solid #bab9b9;
+        border-radius: 2px;
+    }
+
+    .header_row_f th{
+        text-align: center !important;
+    }
+
+    .ncoc_colored td, .ncoc_colored th{
+        background-color: #ddf4f8 !important;
+    }
+
+}
+
+@media  only screen{
+    .fuck-table-responsive{
+        overflow-x: auto !important;
+    }
+}

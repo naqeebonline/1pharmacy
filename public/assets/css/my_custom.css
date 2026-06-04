@@ -1,0 +1,122 @@
+.landing-app-box .bx {
+    font-size: 2rem;
+}
+
+.form-group{
+    margin-bottom: 20px;
+}
+
+.help{
+    font-size: 11px;
+    color: red;
+}
+
+.an-initiative-on{
+    margin-bottom: 2px;
+    padding-bottom: 2px;
+    font-size: 9pt;
+    color: #06AA91;
+    font-family: "Rubik", "Times New Roman", "serif";
+}
+.bottom-border-line{
+    border-bottom: 10px solid #06AA91;
+}
+
+.bg-green-new{
+    background: #06AA91 !important;
+}
+
+.show_in_print {
+    display: none;
+}
+
+
+.page-shortcut{
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 1;
+}
+
+.float-right{float: right;}
+.float-left{float: left;}
+
+.border-right-custom{
+    border-right: 1px groove;
+}
+
+
+.rni-backward{
+    font-size: 2.5rem;
+    position: inherit;
+    left: -2rem;
+    width: 2.8rem;
+    background: white;
+    padding: 10px 0px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+.rni-forward{
+    font-size: 2.5rem;
+    position: inherit;
+    right: 10px;
+    width: 2.8rem;
+    background: white;
+    padding: 10px 0px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    z-index:1
+}
+@media only screen and (max-width: 600px) {
+    .border-right-custom{
+        border-right: unset;
+    }   
+}
+
+@media only screen and (max-width: 1024px) {
+    
+    .rni-backward{
+        font-size: 1.5rem;
+        position: inherit;
+        left: -1.6rem;
+        width: 1.8rem;
+    }
+
+    .rni-forward{
+        font-size: 1.5rem;
+        position: inherit;
+        width: 1.8rem;
+        right: 20px;
+    }
+}
+
+.radio-container{
+    flex-wrap: wrap;
+}
+
+.radio-custom{
+    border: 1px solid white;
+    border-radius: 1.7rem;
+    padding-right: 1rem;
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+    padding-left: 2.2rem;
+    margin: 0.2rem;
+    min-width: 6rem;
+}
+.radio-custom:hover{
+    border-color: #5a8dee !important;
+}
+.radio-custom [type="radio"],
+.radio-custom .form-check-label{
+    cursor: pointer;
+}
+
+.radio-custom.active{
+    background-color: #e5edfc !important;
+    border-color: #5a8dee !important;
+}
+
+.text-heading{
+    color:rgb(139, 5, 5);
+}
