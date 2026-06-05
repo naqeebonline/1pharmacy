@@ -1,0 +1,462 @@
+@extends('layouts.' . config('settings.active_layout'))
+@php $app_id = config('settings.app_id') @endphp
+
+@push('stylesheets')
+    <style>
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 7px;
+            text-align: center;
+            margin-bottom: 20px;
+            float: left;
+            margin-left: 43px;
+            margin-top: -26px;
+
+
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="checkbox"] {
+            /* 1.5 times bigger */
+
+
+        }
+
+        .table> :not(caption)>*>* {
+            padding: 5px;
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
+    {{-- <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script> --}}
+@endpush
+
+@section('content')
+    <div class="row">
+        <div class="col-12">
+
+
+            <div class="row ">
+
+                <div class="col-md-12 mb-4">
+                    <div class="card">
+                        <form id="add_in_patient_payment">
+                            <div class="card-body">
+                                <h5>In Patient Payments</h5>
+
+
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <input type="hidden" value="0" id="patient_id" name="patient_id"
+                                               class="form-control" placeholder="" autocomplete="off">
+
+                                        <input type="hidden" value="0" id="admission_id" name="admission_id"
+                                               class="form-control" placeholder="" autocomplete="off">
+
+                                        <label for="" class="form-label">Select Patient</label>
+                                        <select name="" id="admit_patient" class="form-select">
+                                            <option value="" disabled selected>Select Patient</option>
+                                            @foreach ($patients as $item)
+                                                <option value="{{ $item->id }}" data-item='{{ json_encode($item) }}'
+                                                        data-admission={{ $item->id }} data-patient={{ $item->patient_id }}>
+                                                    {{ $item->patient->name . ' - ' . $item->patient->mr_no }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                </div>
+
+
+
+
+                                <div class="mt-2" id="patient_detail">
+                                    <table class="table table-responsive table-bordered">
+                                        <tr>
+                                            <td style="font-weight: bold">MRNO</td>
+                                            <td>{{ $patient->mr_no ?? '' }}</td>
+                                            <td style="font-weight: bold">Name</td>
+                                            <td>{{ $patient->name ?? '' }}</td>
+                                            <td style="font-weight: bold">Father Name</td>
+                                            <td>{{ $patient->father_husband_name ?? '' }}</td>
+                                            <td style="font-weight: bold">Contact Number</td>
+                                            <td>{{ $patient->contact_no ?? '' }}</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td style="font-weight: bold">Ward No</td>
+                                            <td>{{ $admission->ward->name ?? '' }}</td>
+                                            <td style="font-weight: bold">Bed No</td>
+                                            <td>{{ $admission->bed->name ?? '' }}</td>
+                                            <td style="font-weight: bold">Admission Date</td>
+                                            <td>{{ $admission->admission_date ?? '' }}</td>
+                                            <td style="font-weight: bold">Discharge On</td>
+                                            <td>{{ $patient->discharge_date ?? '' }}</td>
+                                        </tr>
+
+                                    </table>
+
+
+
+                                </div>
+
+                            </div>
+
+                            <div class="card-body">
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <td width="20%" style="font-weight: bold;">Amount</td>
+                                        <td width="20%">
+                                            <input type="number" required id="amount" name="amount" class="form-control" placeholder="" autocomplete="off">
+                                        </td>
+                                        <td width="60%"></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td width="20%" style="font-weight: bold;">Type</td>
+                                        <td width="20%" colspan="2">
+                                            <input class="form-check-input" type="radio" name="payment_type" id="advance" value="advance" checked>
+                                            <label class="form-check-label" for="advance">Advance</label>
+
+                                            <input class="form-check-input" type="radio" name="payment_type" id="return" value="return_to_patient">
+                                            <label class="form-check-label" for="return">Return to Patient</label>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td width="20%" style="font-weight: bold;">Remarks</td>
+                                        <td width="20%">
+                                            <textarea class="form-control" name="remarks" id="remarks"></textarea>
+                                        </td>
+                                        <td width="60%"></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td width="20%" style="font-weight: bold;"></td>
+                                        <td width="20%">
+                                            <button  class="btn btn-success" id="save_my_btn"  type="submit">Submit</button>
+                                        </td>
+                                        <td width="60%"></td>
+                                    </tr>
+
+                                </table>
+                            </div>
+                        </form>
+
+                    </div>
+
+
+
+
+
+                </div>
+            </div>
+
+
+
+
+            <div class="card">
+                <div class="row">
+                    <div class="col">
+
+                        <div class="card mb-3">
+                            <div class="card-header border-bottom">
+                                <ul class="nav nav-tabs card-header-tabs" role="tablist">
+
+                                    <li class="nav-item">
+                                        <button class="nav-link active" data-bs-toggle="tab"
+                                            data-bs-target="#service_charges_tab" role="tab" aria-selected="true">
+                                            Service Charges
+                                        </button>
+                                    </li>
+
+                                  
+
+                                </ul>
+                            </div>
+
+                            <div class="tab-content">
+
+                                
+
+                                <div class="tab-pane active show" id="service_charges_tab" role="tabpanel">
+                                    <div class="table-responsive" style="min-height: 200px">
+                                        <table id="service_charges_table" style="width: 100% !important;"
+                                            class="table table-responsive table-striped data_mf_table table-condensed table-responsive">
+
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 10%">Invoice</th>
+
+                                                    <th style="width: 10%">Amount</th>
+                                                    <th style="width: 10%">Dated</th>
+
+
+                                                    <th style="width: 10%">Action</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /traffic sources -->
+        </div>
+    </div>
+
+@endsection
+
+@push('scripts')
+    <script src="{{ asset('assets/vendor/libs/datatables/jquery.dataTables.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/datatables-responsive/datatables.responsive.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/select2/select2.css') }}" />
+    <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
+    <script src="{{ asset('assets/js/jquery.form.min.js') }}"></script>
+
+    <script>
+        setTimeout(function() {
+
+            $('#admit_patient').select2();
+            $('#service_type_id').select2();
+
+
+
+        }, 1000);
+
+
+      
+        $("body").on("change", "#admit_patient", function(e) {
+
+            $('#investigation_table').DataTable().destroy();
+            $('#service_charges_table').DataTable().destroy();
+            $('#patient_treatment_table').DataTable().destroy();
+            let selectedOption = e.target.options[e.target.selectedIndex];
+
+            let data = JSON.parse(selectedOption.getAttribute("data-item"));;
+
+
+            $("#patient_detail").html("");
+            let html = `
+                <table class="table table-responsive table-bordered" >
+                    <tr>    
+                        <td style="font-weight: bold">MRNO</td>
+                        <td>${data.patient.mr_no}</td>
+                        <td style="font-weight: bold">Name</td>
+                        <td>${data.patient.name}</td>
+                        <td style="font-weight: bold">Father Name</td>
+                        <td>${data.patient.father_husband_name}</td>
+                        <td style="font-weight: bold">Contact Number</td>
+                        <td>${data.patient.contact_no}</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold">Ward No</td>
+                        <td>${data.ward.name ?? ""}</td>
+                        <td style="font-weight: bold">Bed No</td>
+                        <td>${data.bed.name ?? ""}</td>
+                        <td style="font-weight: bold">Admission Date</td>
+                        <td>${data.admission_date ?? ""}</td>
+                        <td style="font-weight: bold">Discharge On</td>
+                        <td>${data.discharge_date ?? ""}</td>
+                    </tr>
+                    </table/>`;
+
+            $("#patient_detail").html(html);
+
+
+            let patient_id = selectedOption.getAttribute("data-patient");
+            let admission_id = selectedOption.getAttribute("data-admission");
+
+            $("#patient_id").val(patient_id);
+            $("#admission_id").val(admission_id);
+
+
+            loadServiceChargesData(patient_id, admission_id);
+        });
+
+
+        $("body").on("change", "#service_type_id", function(e) {
+            let selectedOption = e.target.options[e.target.selectedIndex];
+            let rate = selectedOption.getAttribute("data-rate");
+            $("#service_rate").val(rate);
+        });
+        
+        
+        
+        $("#add_in_patient_payment").on("submit", function(e) {
+
+            e.preventDefault();
+            var patient_id = $("#patient_id").val();
+            var admission_id = $("#admission_id").val();
+            if(patient_id == 0 || patient_id == '' || admission_id == 0 || admission_id == ''){
+                alert("Please select patient");
+                return false;
+            }
+            let isValid = true;
+            // Clear previous error messages
+            $(".error-message").remove();
+            $(".is-invalid").removeClass("is-invalid");
+
+            // Validate required fields
+            $(this).find("[required]").each(function() {
+                if (!$(this).val().trim()) {
+                    isValid = false;
+                    $(this).addClass("is-invalid"); // Highlight invalid field
+                    $(this).after(
+                        `<span class="error-message text-danger">This field is required.</span>`
+                    ); // Show error message
+                }
+            });
+
+
+
+            if (isValid) {
+                $("#save_my_btn").prop('disabled', true).text("Saving....");
+                $("#add_in_patient_payment").ajaxSubmit({
+                    url: '{{ route('pos.save_patient_payment') }}',
+                    type: 'post',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                    },
+                    success: function(response) {
+                        var redirect = "{{$redirect}}";
+                        $("#service_charges_table").DataTable().destroy();
+                        $("#amount").val('');
+                        $("#remarks").val('');
+                        $('#advance').prop('checked', true);
+                        let patient_id = $("#patient_id").val();
+                        let admission_id = $("#admission_id").val();
+                        loadServiceChargesData(patient_id, admission_id);
+                        service_charges_table.ajax.reload();
+                        // $("#save_inv_btn").prop("disabled", false);
+
+
+                        alert("Payment Saved successfully");
+
+                        $("#save_my_btn").prop('disabled', false).text("Submit");
+                        if(redirect){
+                            window.location = "{{route('pos.primary_discharge')}}/"+admission_id;
+                        }
+
+
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        alert(JSON.parse(XMLHttpRequest.responseText).message);
+                        $("#save_my_btn").prop('disabled', false).text("Submit");
+                    }
+                });
+            }
+        });
+
+     
+
+
+
+
+        function loadServiceChargesData(patient_id = '', admission_id = '') {
+            service_charges_table = $('#service_charges_table').DataTable({
+                processing: true,
+                serverSide: true,
+
+                lengthMenu: [
+                    [100, 250, 500, 1000],
+                    ['100', '250', '500', '1000']
+                ],
+                pageLength: 50,
+                ajax: {
+                    url: `{{ route('pos.get_admission_service_charges') }}/${patient_id}/${admission_id}`,
+
+                    data: function(d) {
+                        d.user_id = $('#attendance_user_filter').val();
+                        d.attendance_date_from = $('#attendance_date_from').val();
+                        d.attendance_date_to = $('#attendance_date_to').val();
+
+
+                    }
+
+                },
+
+                columns: [
+
+                    {
+                        data: 'service_type.name',
+                        name: 'service_type.name',
+                        searchable: true
+                    },
+                    {
+                        data: 'service_rate',
+                        name: 'service_rate',
+                        searchable: true
+                    },
+                    {
+                        data: 'service_date',
+                        name: 'service_date',
+                        searchable: true
+                    },
+                    {
+                        data: 'actions',
+                        name: 'actions',
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                searching: true,
+                sorting: true,
+                paging: true,
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'csv', 'excel', 'pdf', 'print'
+                ]
+            });
+        }
+
+
+         $("body").on("click", ".delete_service_record", function(e) {
+            var id = $(this).attr("data-id");
+             var  admission_id = $("#admission_id").val();
+            if (confirm('Are you sure to delete this record ?')) {
+                $.ajax({
+                    type: 'post',
+                    url: "{{ route('pos.deactivate_record') }}",
+                    data: {
+                        id: id,
+                        admission_id: admission_id,
+                        table: "patient_service_charges",
+                        _token: '{{ csrf_token() }}'
+
+                    },
+                    success: function(res) {
+                        service_charges_table.ajax.reload();
+                        //window.location.reload();
+                    }
+                })
+            } else {
+                alert('Why did you press cancel? You should have confirmed');
+            }
+        });
+    
+
+     
+    </script>
+@endpush
